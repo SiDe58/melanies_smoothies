@@ -1,5 +1,5 @@
 
-# Import python packages
+# streamlit_app.py
 import streamlit as st
 from snowflake.snowpark.functions import col
 
@@ -11,8 +11,8 @@ st.write("🥤🥤🥤 **Choose the fruits you want in your custom Smoothie!** �
 name_on_order = st.text_input("Name on Smoothie:")
 st.write("The name on the Smoothie will be:", name_on_order)
 
-# Snowflake session via Streamlit connection
-# Make sure you have a 'snowflake' connection defined in .streamlit/secrets.toml
+# ✅ Snowflake session via Streamlit connection named "snowflake"
+#    Requires [connections.snowflake] block in secrets (see templates above)
 cnx = st.connection("snowflake")
 session = cnx.session()
 
@@ -23,7 +23,7 @@ my_dataframe = (
 )
 st.dataframe(data=my_dataframe, use_container_width=True)
 
-# Multiselect limited to 5
+# Limit to 5
 fruit_options = my_dataframe.to_pandas()["FRUIT_NAME"].tolist()
 ingredients_list = st.multiselect(
     "Choose up to 5 ingredients:",
@@ -31,7 +31,7 @@ ingredients_list = st.multiselect(
     max_selections=5,
 )
 
-# Friendly hint at the cap
+# Friendly hint at cap
 if len(ingredients_list) == 5:
     st.info("You can only select up to 5 options. Remove one to add a different fruit.")
 
@@ -39,9 +39,10 @@ if len(ingredients_list) == 5:
 if ingredients_list:
     ingredients_string = " ".join(ingredients_list)
 
-    # Simple (unsafe) SQL string — will work if table defaults exist for other columns
+    # ⚠️ This assumes your ORDERS table has defaults for any other required columns.
+    # If you see "expecting 5 but got 2", we must include the other columns explicitly.
     my_insert_stmt = f"""
-        INSERT INTO smoothies.public.orders(INGREDIENTS, NAME_ON_ORDER)
+        INSERT INTO smoothies.public.orders (INGREDIENTS, NAME_ON_ORDER)
         VALUES ('{ingredients_string}', '{name_on_order}')
     """
 
