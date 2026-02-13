@@ -4,8 +4,8 @@ import streamlit as st
 from snowflake.snowpark.functions import col
 
 # Title
-st.title("🥤 Customize Your Smoothie! 🥤")
-st.write(
+streamlit.title("🥤 Customize Your Smoothie! 🥤")
+streamlit.write(
     "🥤🥤🥤 **Choose the fruits you want in your custom Smoothie!** 🥤🥤🥤"
 )
 
